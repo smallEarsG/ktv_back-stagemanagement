@@ -1,0 +1,70 @@
+<view class="container">
+  <!-- 退款商品卡片 -->
+  <view class="card">
+    <view class="card-header">
+      <view class="section-title">选择退款商品</view>
+      <view class="subtitle">请选择您需要退款的商品</view>
+    </view>
+    <view class="product-list">
+      <checkbox-group bindchange="checkboxChange">
+        <label class="product-item {{item.checked ? 'selected' : ''}}" wx:for="{{products}}" wx:key="id">
+          <view class="checkbox-wrapper">
+             <checkbox value="{{item.id}}" checked="{{item.checked}}" color="#d81e06"/>
+          </view>
+          <view class="product-content">
+            <view class="product-main">
+              <view class="name">{{item.name}}</view>
+              <view class="price">¥{{item.price}}</view>
+            </view>
+            
+            <!-- 选中状态显示数量加减 -->
+            <view class="stepper" wx:if="{{item.checked}}">
+              <view class="stepper-btn minus {{item.refundCount <= 1 ? 'disabled' : ''}}" catchtap="decreaseCount" data-index="{{index}}">-</view>
+              <view class="stepper-num">{{item.refundCount}}</view>
+              <view class="stepper-btn plus" catchtap="increaseCount" data-index="{{index}}">+</view>
+            </view>
+            <!-- 未选中状态显示原数量 -->
+            <view class="qty-label" wx:else>x{{item.count}}</view>
+          </view>
+        </label>
+      </checkbox-group>
+    </view>
+  </view>
+
+  <!-- 退款原因卡片 -->
+  <view class="card">
+    <view class="card-header">
+      <view class="section-title">退款信息</view>
+    </view>
+    
+    <view class="form-item">
+      <view class="label">退款原因</view>
+      <picker range="{{reasons}}" bindchange="onReasonChange" class="picker-box">
+        <view class="picker-inner">
+          <text class="{{reasonIndex === -1 ? 'placeholder' : ''}}">{{reasons[reasonIndex] || '请选择退款原因'}}</text>
+          <text class="arrow-right"></text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item vertical">
+      <view class="label">补充描述</view>
+      <view class="textarea-box">
+        <textarea 
+          class="reason-input" 
+          placeholder="补充描述，有助于商家更好的处理售后问题" 
+          bindinput="onReasonInput"
+          maxlength="{{maxWordCount}}"
+          placeholder-style="color: #999;"
+        ></textarea>
+        <view class="word-count">{{currentWordCount}}/{{maxWordCount}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部提交 -->
+  <view class="footer-placeholder"></view>
+  <view class="footer">
+    <button class="submit-btn" bindtap="submitRefund" hover-class="btn-hover">提交申请</button>
+  </view>
+</view>

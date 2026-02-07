@@ -1,0 +1,78 @@
+# =========================
+# Node / UniApp
+# =========================
+node_modules/
+unpackage/
+dist/
+.hbuilderx/
+
+# npm / yarn / pnpm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# 微信小程序
+# =========================
+project.private.config.json
+project.local.config.json
+
+# 小程序本地缓存
+miniprogram_npm/
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+*.iml
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Env
+# =========================
+.env
+.env.local
+.env.*.local
+
+# =========================
+# Build files
+# =========================
+*.map
+*.tmp
+*.temp
+
+# =========================
+# Java / SpringBoot（如果有后端）
+# =========================
+target/
+*.class
+*.jar
+*.war
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
+# =========================
+# 上传文件目录（如果有）
+# =========================
+uploads/
+static/uploads/
+
+# =========================
+# 数据库文件
+# =========================
+*.db
+*.sql

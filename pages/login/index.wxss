@@ -1,0 +1,54 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100vh;
+  padding: 100rpx 0;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.logo-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 100rpx;
+}
+
+.logo {
+  width: 160rpx;
+  height: 160rpx;
+  background-color: #f8f8f8;
+  border-radius: 50%;
+  margin-bottom: 30rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.login-box {
+  width: 100%;
+  padding: 0 60rpx;
+  margin-bottom: 100rpx;
+}
+
+.login-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  background-color: #d81e06 !important;
+  color: #fff;
+}
+
+.tips {
+  margin-top: 30rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+}

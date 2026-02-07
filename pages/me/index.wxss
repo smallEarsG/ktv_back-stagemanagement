@@ -1,0 +1,194 @@
+.container {
+  min-height: 100vh;
+  background-color: #f7f8fa;
+  padding: 0;
+  display: block; /* Override flex from app.wxss if needed, though app.wxss has specific padding which might break things. Ideally I should reset it */
+}
+
+/* Override app.wxss container styles if they interfere */
+page {
+  background-color: #f7f8fa;
+}
+
+/* Header Section */
+.header-section {
+  position: relative;
+  background: linear-gradient(135deg, #1c92d2 0%, #f2fcfe 100%); /* Fallback */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Deep Purple/Blue */
+  padding: 40rpx 30rpx 80rpx; /* Extra bottom padding for overlap if desired, or just spacing */
+  color: #fff;
+  border-bottom-left-radius: 30rpx;
+  border-bottom-right-radius: 30rpx;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  border: 4rpx solid rgba(255, 255, 255, 0.3);
+  margin-right: 30rpx;
+  background-color: #fff;
+}
+
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.nickname {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.member-badge {
+  display: inline-block;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  align-self: flex-start;
+}
+
+.user-desc {
+  font-size: 26rpx;
+  opacity: 0.8;
+}
+
+.arrow-right {
+  font-size: 32rpx;
+  opacity: 0.6;
+}
+
+/* Card Sections */
+.card-section {
+  background-color: #fff;
+  margin: 20rpx 30rpx;
+  border-radius: 20rpx;
+  padding: 0;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+/* Order Section specific */
+.order-section {
+  margin-top: -40rpx; /* Pull up to overlap header slightly if desired, or just margin-top: 20rpx */
+  margin-top: -30rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.section-header {
+  padding: 24rpx 30rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.section-more {
+  font-size: 24rpx;
+  color: #999;
+  display: flex;
+  align-items: center;
+}
+
+.section-more .arrow {
+  margin-left: 6rpx;
+}
+
+.status-grid {
+  display: flex;
+  justify-content: space-around;
+  padding: 30rpx 0;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.status-icon {
+  font-size: 48rpx;
+  margin-bottom: 10rpx;
+}
+
+.status-item text {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* Menu Section */
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+  background-color: #fff;
+  font-size: 30rpx;
+  color: #333;
+  line-height: 1.5;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+  width: 100%;
+}
+
+.menu-item:active {
+  background-color: #f9f9f9;
+}
+
+.menu-left {
+  display: flex;
+  align-items: center;
+}
+
+.menu-icon {
+  margin-right: 20rpx;
+  font-size: 36rpx;
+  width: 40rpx;
+  text-align: center;
+}
+
+.contact-btn {
+  width: 100%;
+  font-weight: normal;
+  margin: 0;
+  border-radius: 0;
+  text-align: left;
+}
+
+.contact-btn::after {
+  border: none;
+}
+
+.arrow {
+  color: #ccc;
+  font-size: 30rpx;
+}
+
+/* Footer */
+.footer-info {
+  text-align: center;
+  padding: 40rpx 0;
+  color: #ccc;
+  font-size: 24rpx;
+}

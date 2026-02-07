@@ -1,0 +1,70 @@
+<view class="container">
+  <!-- Image Area -->
+  <view class="img-container">
+    <image class="product-img" src="{{product.image}}" mode="aspectFill"></image>
+  </view>
+  
+  <!-- Main Info Card -->
+  <view class="info-card">
+    <view class="price-row">
+      <view class="price-wrapper">
+        <text class="currency">¥</text>
+        <text class="price-num">{{product.price}}</text>
+      </view>
+      <view class="sales">月售 {{product.sales || 99}}+</view>
+    </view>
+    
+    <view class="header-row">
+      <view class="name">{{product.name}}</view>
+    </view>
+    
+    <view class="desc">{{product.desc || '暂无描述'}}</view>
+  </view>
+
+  <!-- Remark Card -->
+  <view class="card remark-card">
+    <view class="section-header">
+      <view class="section-title">备注要求</view>
+      <view class="section-subtitle">选填</view>
+    </view>
+    <textarea 
+      class="remark-input" 
+      placeholder="请输入口味、做法等要求（如：少冰、微辣）" 
+      placeholder-style="color:#ccc"
+      bindinput="onRemarkInput"
+      value="{{remark}}"
+      disable-default-padding
+    ></textarea>
+  </view>
+
+  <!-- Detail Card -->
+  <view class="card detail-card">
+    <view class="section-title">商品详情</view>
+    <view class="detail-content">
+      {{product.detail || '暂无详细介绍'}}
+    </view>
+  </view>
+  
+  <!-- Spacer for fixed bottom bar -->
+  <view class="bottom-spacer"></view>
+
+  <!-- Bottom Action Bar -->
+  <view class="action-bar">
+    <view class="cart-icon-wrapper" bindtap="goToCart">
+      <view class="cart-icon-box">
+        <text class="cart-symbol">🛒</text>
+        <view class="cart-badge" wx:if="{{cartTotalNum > 0}}">{{cartTotalNum}}</view>
+      </view>
+      <text class="cart-text">购物车</text>
+    </view>
+    
+    <view class="action-right">
+      <view class="stepper">
+        <view class="stepper-btn minus {{count <= 1 ? 'disabled' : ''}}" bindtap="decreaseCount">-</view>
+        <view class="count">{{count}}</view>
+        <view class="stepper-btn plus" bindtap="increaseCount">+</view>
+      </view>
+      <view class="add-btn" bindtap="addToCart">加入购物车</view>
+    </view>
+  </view>
+</view>

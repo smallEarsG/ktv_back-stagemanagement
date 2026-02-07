@@ -1,0 +1,82 @@
+<view class="container">
+  <!-- Top Header Area -->
+  <view class="header-section">
+    <view class="user-card" bindtap="{{!userInfo ? 'goToLogin' : ''}}">
+      <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="user-info">
+        <view class="nickname">{{userInfo.nickName || '点击登录/注册'}}</view>
+        <view class="member-badge" wx:if="{{userInfo}}">普通会员</view>
+        <view class="user-desc" wx:else>登录后享受更多权益</view>
+      </view>
+      <view class="arrow-right" wx:if="{{!userInfo}}">></view>
+    </view>
+  </view>
+
+  <!-- Order Status Area -->
+  <view class="card-section order-section">
+    <view class="section-header" bindtap="goToOrders" data-type="all">
+      <text class="section-title">我的订单</text>
+      <view class="section-more">
+        <text>全部订单</text>
+        <text class="arrow">></text>
+      </view>
+    </view>
+    <view class="status-grid">
+      <view class="status-item" bindtap="goToOrders" data-type="pending">
+        <view class="status-icon">🕒</view>
+        <text>待付款</text>
+      </view>
+      <view class="status-item" bindtap="goToOrders" data-type="processing">
+        <view class="status-icon">📦</view>
+        <text>进行中</text>
+      </view>
+      <view class="status-item" bindtap="goToOrders" data-type="completed">
+        <view class="status-icon">✅</view>
+        <text>已完成</text>
+      </view>
+      <view class="status-item" bindtap="goToOrders" data-type="refund">
+        <view class="status-icon">🎧</view>
+        <text>退款/售后</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Function Menu Area -->
+  <view class="card-section menu-section">
+    <view class="menu-item">
+      <view class="menu-left">
+        <text class="menu-icon">🎫</text>
+        <text>我的优惠券</text>
+      </view>
+      <text class="arrow">></text>
+    </view>
+    
+    <view class="menu-item">
+      <view class="menu-left">
+        <text class="menu-icon">👑</text>
+        <text>会员中心</text>
+      </view>
+      <text class="arrow">></text>
+    </view>
+
+    <button class="menu-item contact-btn" open-type="contact">
+      <view class="menu-left">
+        <text class="menu-icon">💬</text>
+        <text>联系客服</text>
+      </view>
+      <text class="arrow">></text>
+    </button>
+    
+    <view class="menu-item" bindtap="logout" wx:if="{{userInfo}}">
+      <view class="menu-left">
+        <text class="menu-icon">🚪</text>
+        <text>退出登录</text>
+      </view>
+      <text class="arrow">></text>
+    </view>
+  </view>
+  
+  <view class="footer-info">
+    <text>KTV Mini v1.0.0</text>
+  </view>
+</view>

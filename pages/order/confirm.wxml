@@ -1,0 +1,30 @@
+<view class="container">
+  <view class="section store-info">
+    <view class="label">当前房间/座位</view>
+    <view class="value">{{storeInfo.seatId || '未知'}}</view>
+  </view>
+
+  <view class="section order-list">
+    <view class="section-title">订单详情</view>
+    <view class="order-item" wx:for="{{cartList}}" wx:key="id">
+      <image class="item-img" src="{{item.image}}" mode="aspectFill"></image>
+      <view class="item-info">
+        <view class="item-name">{{item.name}}</view>
+        <view class="item-remark" wx:if="{{item.remark}}">备注: {{item.remark}}</view>
+        <view class="item-price">¥{{item.price}}</view>
+      </view>
+      <view class="stepper">
+        <view class="minus" bindtap="decreaseCart" data-index="{{index}}">-</view>
+        <view class="count">{{item.cartNum}}</view>
+        <view class="plus" bindtap="increaseCart" data-index="{{index}}">+</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <view class="total-price">
+      合计: <text class="price-num">¥{{totalPrice}}</text>
+    </view>
+    <view class="pay-btn" bindtap="submitOrder">立即支付</view>
+  </view>
+</view>
