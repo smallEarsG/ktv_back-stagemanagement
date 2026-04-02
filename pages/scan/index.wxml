@@ -1,6 +1,0 @@
-<view class="container">
-  <view class="loading-box">
-    <view class="loading-icon"></view>
-    <text class="loading-text">正在进入门店...</text>
-  </view>
-</view>
