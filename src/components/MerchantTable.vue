@@ -3,6 +3,7 @@ import UiButton from '@/components/UiButton.vue'
 import { formatDateTime } from '@/utils/format'
 
 defineProps({
+  pendingIds: { type: Object, default: () => ({}) },
   loading: { type: Boolean, default: false },
   rows: { type: Array, default: () => [] },
 })
@@ -72,6 +73,7 @@ const emit = defineEmits(['edit', 'toggle'])
               <UiButton
                 :variant="row.isActive ? 'danger' : 'primary'"
                 class="px-3 py-1"
+                :disabled="Boolean(pendingIds[row.id])"
                 @click="emit('toggle', row)"
               >
                 {{ row.isActive ? '停用' : '启用' }}

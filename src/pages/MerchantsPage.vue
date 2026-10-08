@@ -24,6 +24,8 @@ const page = ref(1)
 const pageSize = ref(20)
 
 const loading = ref(false)
+const pendingIds = reactive({})
+let listRequestId = 0
 const loadError = ref('')
 const total = ref(0)
 const rows = ref([])
@@ -43,6 +45,7 @@ const totalPages = computed(() => {
 })
 
 async function fetchList() {
+  const requestId = ++listRequestId
   loading.value = true
   loadError.value = ''
   try {
@@ -52,12 +55,13 @@ async function fetchList() {
       page: page.value,
       pageSize: pageSize.value,
     })
+    if (requestId !== listRequestId) return
     total.value = data?.total || 0
     rows.value = Array.isArray(data?.list) ? data.list : []
   } catch (e) {
-    loadError.value = e?.message || '加载失败'
+    if (requestId === listRequestId) loadError.value = e?.message || '加载失败'
   } finally {
-    loading.value = false
+    if (requestId === listRequestId) loading.value = false
   }
 }
 
@@ -105,6 +109,7 @@ function closeModal() {
 }
 
 async function submitModal(payload) {
+  if (modalSubmitting.value || modalLoadingDetail.value) return
   modalSubmitting.value = true
   modalError.value = ''
   try {
@@ -124,27 +129,16 @@ async function submitModal(payload) {
 
 async function toggleActive(row) {
   const id = row?.id
-  if (!id) return
-
-  if (row.isActive) {
-    const ok = window.confirm('确认要停用该商家吗？')
-    if (!ok) return
-    try {
-      await disableMerchant(id)
-      await fetchList()
-    } catch (e) {
-      window.alert(e?.message || '操作失败')
-    }
-    return
-  }
-
-  const ok = window.confirm('确认要启用该商家吗？')
-  if (!ok) return
+  if (!id || pendingIds[id]) return
+  if (!window.confirm(`确认要${row.isActive ? '停用' : '启用'}该商家吗？`)) return
+  pendingIds[id] = true
   try {
-    await enableMerchant(id)
+    await (row.isActive ? disableMerchant(id) : enableMerchant(id))
     await fetchList()
   } catch (e) {
-    window.alert(e?.message || '操作失败')
+    loadError.value = e?.message || '操作失败'
+  } finally {
+    pendingIds[id] = false
   }
 }
 
@@ -169,6 +163,8 @@ onMounted(() => {
   <div class="min-h-screen bg-[#F5F7FA]">
     <AppHeader />
     <main class="mx-auto max-w-[1440px] px-6 py-6">
+      <h1 class="mb-2 text-2xl font-semibold text-slate-900">门店管理</h1>
+      <p class="mb-6 text-sm text-slate-500">维护门店基础资料及启停状态。此演示不包含订阅计费或营销功能。</p>
       <div class="mb-4 rounded-lg bg-white p-5 shadow">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
           <UiInput v-model="filters.keyword" label="关键词" placeholder="商家名称" />
@@ -199,7 +195,7 @@ onMounted(() => {
           {{ loadError }}
         </div>
 
-        <MerchantTable :loading="loading" :rows="rows" @edit="openEdit" @toggle="toggleActive" />
+        <MerchantTable :loading="loading" :rows="rows" :pending-ids="pendingIds" @edit="openEdit" @toggle="toggleActive" />
 
         <PaginationBar
           :page="page"

@@ -29,7 +29,7 @@ function validate() {
 
   let ok = true
   if (!String(form.phone).trim()) {
-    errors.phone = '请输入手机号'
+    errors.phone = '请输入账号或手机号'
     ok = false
   }
   if (!String(form.password).trim()) {
@@ -40,6 +40,7 @@ function validate() {
 }
 
 async function onSubmit() {
+  if (submitting.value) return
   if (!validate()) return
   submitting.value = true
   apiError.value = ''
@@ -68,8 +69,8 @@ async function onSubmit() {
           <UiInput
             v-model="form.phone"
             name="phone"
-            label="手机号"
-            placeholder="请输入手机号"
+            label="账号 / 手机号"
+            placeholder="请输入账号或手机号"
             :error="errors.phone"
           />
           <UiInput
@@ -88,7 +89,7 @@ async function onSubmit() {
           <UiButton class="w-full" type="submit" :loading="submitting">登录</UiButton>
         </form>
 
-        <div class="mt-6 text-center text-xs text-zinc-500">超级管理系统</div>
+        <div class="mt-6 text-center text-xs text-zinc-500">本地演示：platform-local / LocalDemo123!</div>
       </div>
     </div>
   </div>
