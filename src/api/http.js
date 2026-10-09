@@ -30,16 +30,26 @@ export function createHttpClient() {
     async (error) => {
       const status = error?.response?.status
       const code = error?.response?.data?.code
+      const responseData = error?.response?.data
+      const entryExpired = status === 401 && API_BASE_URL.startsWith('/demo/api') && typeof responseData === 'string'
+      if (entryExpired) {
+        error.demoEntryExpired = true
+        error.message = '演示入口验证已过期，请重新验证入口后登录'
+      } else if (responseData?.message || responseData?.msg) {
+        error.message = responseData.message || responseData.msg
+      }
 
       if (status === 401 || code === 401) {
         clearAuth()
+        const basePath = import.meta.env.BASE_URL || '/'
+        const routePath = window.location.pathname.slice(basePath.length - 1)
         const current =
-          window.location.pathname +
+          routePath +
           window.location.search +
           window.location.hash
-        if (!window.location.pathname.startsWith('/login')) {
+        if (!routePath.startsWith('/login')) {
           window.location.replace(
-            `/login?redirect=${encodeURIComponent(current)}`,
+            `${basePath}login?${entryExpired ? 'reason=demo-entry-expired&' : ''}redirect=${encodeURIComponent(current)}`,
           )
         }
       }

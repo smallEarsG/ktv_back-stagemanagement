@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getToken, getUser, setToken, setUser, clearAuth } from '@/utils/auth'
+import { getToken, getUser, setToken, setUser, clearAuth, isPlatformUser, PLATFORM_ACCOUNT_MESSAGE } from '@/utils/auth'
 import { getCurrentUser, login as loginApi } from '@/api/auth'
 
 export const useAuthStore = defineStore('auth', {
@@ -26,11 +26,19 @@ export const useAuthStore = defineStore('auth', {
     },
     async login(phone, password) {
       const data = await loginApi({ phone, password })
+      if (!isPlatformUser(data?.userInfo)) {
+        this.logout()
+        throw new Error(PLATFORM_ACCOUNT_MESSAGE)
+      }
       this.setAuth(data)
       return data
     },
     async fetchMe() {
       const me = await getCurrentUser()
+      if (!isPlatformUser(me)) {
+        this.logout()
+        throw new Error(PLATFORM_ACCOUNT_MESSAGE)
+      }
       this.user = me
       setUser(me)
       return me

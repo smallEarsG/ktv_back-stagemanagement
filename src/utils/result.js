@@ -11,13 +11,15 @@ export function unwrapResult(res) {
   if (payload.code !== 200) {
     if (payload.code === 401) {
       clearAuth()
+      const basePath = import.meta.env.BASE_URL || '/'
+      const routePath = window.location.pathname.slice(basePath.length - 1)
       const current =
-        window.location.pathname + window.location.search + window.location.hash
-      if (!window.location.pathname.startsWith('/login')) {
-        window.location.replace(`/login?redirect=${encodeURIComponent(current)}`)
+        routePath + window.location.search + window.location.hash
+      if (!routePath.startsWith('/login')) {
+        window.location.replace(`${basePath}login?redirect=${encodeURIComponent(current)}`)
       }
     }
-    const err = new Error(payload.msg || '请求失败')
+    const err = new Error(payload.message || payload.msg || '请求失败')
     err.code = payload.code
     throw err
   }
