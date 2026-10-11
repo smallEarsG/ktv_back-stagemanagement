@@ -31,3 +31,11 @@ export async function enableMerchant(id) {
   return unwrapResult(res)
 }
 
+export async function getMerchantWechat(storeId) {
+  return unwrapResult(await http.get(`/platform/stores/${encodeURIComponent(storeId)}/wechat`))
+}
+
+export async function saveMerchantWechat(storeId, body) {
+  return unwrapResult(await http.put(`/platform/stores/${encodeURIComponent(storeId)}/wechat`, body))
+}
+

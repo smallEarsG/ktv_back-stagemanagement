@@ -10,6 +10,7 @@ import {
 } from '@/api/merchant'
 import AppHeader from '@/components/AppHeader.vue'
 import MerchantFormModal from '@/components/MerchantFormModal.vue'
+import MerchantWechatModal from '@/components/MerchantWechatModal.vue'
 import MerchantTable from '@/components/MerchantTable.vue'
 import PaginationBar from '@/components/PaginationBar.vue'
 import UiButton from '@/components/UiButton.vue'
@@ -37,6 +38,7 @@ const modalError = ref('')
 const editingId = ref(null)
 const modalInitial = ref({})
 const modalLoadingDetail = ref(false)
+const wechatMerchant = ref(null)
 
 const totalPages = computed(() => {
   const t = Number(total.value) || 0
@@ -164,7 +166,7 @@ onMounted(() => {
     <AppHeader />
     <main class="mx-auto max-w-[1440px] px-6 py-6">
       <h1 class="mb-2 text-2xl font-semibold text-slate-900">门店管理</h1>
-      <p class="mb-6 text-sm text-slate-500">维护门店基础资料及启停状态。此演示不包含订阅计费或营销功能。</p>
+      <p class="mb-6 text-sm text-slate-500">维护商户账号、门店状态及每店独立的小程序和收款配置。</p>
       <div class="mb-4 rounded-lg bg-white p-5 shadow">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
           <UiInput v-model="filters.keyword" label="关键词" placeholder="商家名称" />
@@ -195,7 +197,7 @@ onMounted(() => {
           {{ loadError }}
         </div>
 
-        <MerchantTable :loading="loading" :rows="rows" :pending-ids="pendingIds" @edit="openEdit" @toggle="toggleActive" />
+        <MerchantTable :loading="loading" :rows="rows" :pending-ids="pendingIds" @edit="openEdit" @toggle="toggleActive" @wechat="wechatMerchant = $event" />
 
         <PaginationBar
           :page="page"
@@ -217,6 +219,7 @@ onMounted(() => {
       @close="closeModal"
       @submit="submitModal"
     />
+    <MerchantWechatModal :open="!!wechatMerchant" :store-id="wechatMerchant?.id || ''" :store-name="wechatMerchant?.name || ''" @close="wechatMerchant = null" />
   </div>
 </template>
 

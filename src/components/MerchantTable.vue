@@ -8,7 +8,7 @@ defineProps({
   rows: { type: Array, default: () => [] },
 })
 
-const emit = defineEmits(['edit', 'toggle'])
+const emit = defineEmits(['edit', 'toggle', 'wechat'])
 </script>
 
 <template>
@@ -70,6 +70,7 @@ const emit = defineEmits(['edit', 'toggle'])
               >
                 编辑
               </UiButton>
+              <UiButton variant="secondary" class="px-3 py-1" @click="emit('wechat', row)">微信配置</UiButton>
               <UiButton
                 :variant="row.isActive ? 'danger' : 'primary'"
                 class="px-3 py-1"
