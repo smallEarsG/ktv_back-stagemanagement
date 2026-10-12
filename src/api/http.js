@@ -1,8 +1,10 @@
 import axios from 'axios'
 import { getToken, clearAuth } from '@/utils/auth'
+import { createTelemetryReporter } from '@/utils/telemetry'
 
 export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || '/api'
+export const reportTelemetry = createTelemetryReporter({ baseURL: API_BASE_URL, getToken, getStore: () => 0 })
 
 export function createHttpClient() {
   const http = axios.create({
@@ -28,6 +30,7 @@ export function createHttpClient() {
   http.interceptors.response.use(
     (response) => response,
     async (error) => {
+      if (error.code !== 'ERR_CANCELED' && (!error.response || (error.response.status >= 500 && !error.response.headers?.['x-request-id']))) reportTelemetry('NETWORK', error.config?.url)
       const status = error?.response?.status
       const code = error?.response?.data?.code
       const responseData = error?.response?.data

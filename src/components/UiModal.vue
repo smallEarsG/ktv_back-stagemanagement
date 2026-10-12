@@ -20,7 +20,7 @@ function onBackdrop(e) {
       aria-modal="true"
       @click="onBackdrop"
     >
-      <div class="w-full max-w-xl rounded-lg bg-white shadow-xl">
+      <div class="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-lg bg-white shadow-xl">
         <div class="flex items-center justify-between border-b px-5 py-4">
           <div class="text-base font-semibold text-zinc-900">{{ title }}</div>
           <button

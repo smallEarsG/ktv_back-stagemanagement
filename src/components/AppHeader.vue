@@ -15,8 +15,9 @@ function logout() {
 
 <template>
   <header class="border-b bg-white">
-    <div class="mx-auto flex h-14 max-w-[1440px] items-center justify-between px-6">
+    <div class="mx-auto flex min-h-14 max-w-[1440px] flex-wrap items-center justify-between gap-2 px-4 py-3 sm:px-6">
       <div class="text-sm font-semibold text-zinc-900">超级管理系统</div>
+      <nav class="flex gap-4 text-sm"><RouterLink to="/merchants" class="text-slate-600" active-class="font-semibold text-blue-700">门店管理</RouterLink><RouterLink to="/operations" class="text-slate-600" active-class="font-semibold text-blue-700">运行保障</RouterLink></nav>
       <div class="flex items-center gap-3">
         <div class="text-sm text-zinc-700">{{ auth.displayName || '管理员' }}</div>
         <UiButton variant="secondary" @click="logout">

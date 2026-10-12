@@ -4,8 +4,10 @@ import { isPlatformUser, PLATFORM_ACCOUNT_MESSAGE } from '@/utils/auth'
 
 import LoginPage from '@/pages/LoginPage.vue'
 import MerchantsPage from '@/pages/MerchantsPage.vue'
+import OperationsPage from '@/pages/OperationsPage.vue'
 
 const routes = [
+  { path: '/operations', name: 'operations', component: OperationsPage, meta: { requiresAuth: true } },
   { path: '/', redirect: '/merchants' },
   { path: '/login', name: 'login', component: LoginPage },
   {
