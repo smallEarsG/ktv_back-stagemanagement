@@ -9,6 +9,7 @@ const props = defineProps({
   mode: { type: String, default: 'create' },
   initialValue: { type: Object, default: () => ({}) },
   submitting: { type: Boolean, default: false },
+  disabled: { type: Boolean, default: false },
   errorMessage: { type: String, default: '' },
 })
 
@@ -85,8 +86,8 @@ function validate() {
       errors.adminUsername = '请填写管理员账号'
       ok = false
     }
-    if (!String(form.adminPassword).trim()) {
-      errors.adminPassword = '请填写管理员密码'
+    if (form.adminPassword.length < 8 || new TextEncoder().encode(form.adminPassword).length > 72 || !form.adminPassword.trim()) {
+      errors.adminPassword = '管理员密码至少8位，UTF-8长度不超过72字节'
       ok = false
     }
     if (!String(form.adminPhone).trim()) {
@@ -99,6 +100,7 @@ function validate() {
 }
 
 function onSubmit() {
+  if (props.disabled || props.submitting) return
   if (!validate()) return
 
   if (props.mode === 'edit') {
@@ -175,7 +177,7 @@ function onSubmit() {
         <UiButton variant="secondary" :disabled="submitting" @click="emit('close')">
           取消
         </UiButton>
-        <UiButton :loading="submitting" @click="onSubmit">保存</UiButton>
+        <UiButton :loading="submitting" :disabled="disabled" @click="onSubmit">保存</UiButton>
       </div>
     </div>
   </UiModal>

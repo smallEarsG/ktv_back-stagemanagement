@@ -8,7 +8,7 @@ defineProps({
   rows: { type: Array, default: () => [] },
 })
 
-const emit = defineEmits(['edit', 'toggle', 'wechat'])
+const emit = defineEmits(['edit', 'toggle', 'wechat', 'reset', 'service'])
 </script>
 
 <template>
@@ -71,6 +71,8 @@ const emit = defineEmits(['edit', 'toggle', 'wechat'])
                 编辑
               </UiButton>
               <UiButton variant="secondary" class="px-3 py-1" @click="emit('wechat', row)">微信配置</UiButton>
+              <UiButton v-if="Number(row.id) > 0" variant="secondary" class="whitespace-nowrap px-3 py-1" @click="emit('service', row)">服务期限</UiButton>
+              <UiButton v-if="Number(row.id) > 0" variant="secondary" class="whitespace-nowrap px-3 py-1" @click="emit('reset', row)">重置店长密码</UiButton>
               <UiButton
                 :variant="row.isActive ? 'danger' : 'primary'"
                 class="px-3 py-1"

@@ -7,6 +7,9 @@ import MerchantsPage from '@/pages/MerchantsPage.vue'
 import OperationsPage from '@/pages/OperationsPage.vue'
 
 const routes = [
+  { path: '/audit', name: 'audit', component: () => import('@/pages/AuditPage.vue'), meta: { requiresAuth: true } },
+  { path: '/subscriptions', name: 'subscriptions', component: () => import('@/pages/SubscriptionsPage.vue'), meta: { requiresAuth: true } },
+  { path: '/account/security', name: 'account-security', component: () => import('@/pages/AccountSecurityPage.vue'), meta: { requiresAuth: true } },
   { path: '/operations', name: 'operations', component: OperationsPage, meta: { requiresAuth: true } },
   { path: '/', redirect: '/merchants' },
   { path: '/login', name: 'login', component: LoginPage },
@@ -45,6 +48,7 @@ router.beforeEach(async (to) => {
     return { path: '/login', query: { reason: 'platform-account-required' } }
   }
 
+  if (auth.isAuthed && auth.user?.passwordChangeRequired && to.path !== '/account/security') return { path: '/account/security' }
   if (to.path === '/login' && auth.isAuthed) return { path: '/merchants' }
 
   if (to.meta?.requiresAuth && !auth.isAuthed) {

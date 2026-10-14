@@ -5,7 +5,7 @@ const USER_KEY = prefix + 'sm_user'
 export const PLATFORM_ACCOUNT_MESSAGE = '此账号不是平台管理员，请使用平台账号登录；商家账号请进入商家后台。'
 
 export function isPlatformUser(user) {
-  return user?.storeId === 0 || user?.storeId === '0'
+  return (user?.storeId === 0 || user?.storeId === '0') && user?.role === 'admin'
 }
 
 export function getToken() {

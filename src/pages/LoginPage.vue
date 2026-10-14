@@ -80,6 +80,7 @@ async function onSubmit() {
           <div class="mt-1 text-sm text-zinc-500">使用平台账号登录，商家店长账号请进入商家后台</div>
         </div>
 
+        <p v-if="route.query.reason === 'password-changed'" role="status" class="mb-4 text-sm text-green-700">密码已修改，请使用新密码重新登录。</p>
         <form class="space-y-4" @submit.prevent="onSubmit">
           <UiInput
             v-model="form.phone"

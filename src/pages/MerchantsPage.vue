@@ -15,6 +15,8 @@ import MerchantTable from '@/components/MerchantTable.vue'
 import PaginationBar from '@/components/PaginationBar.vue'
 import UiButton from '@/components/UiButton.vue'
 import UiInput from '@/components/UiInput.vue'
+import ResetAdminModal from '@/components/ResetAdminModal.vue'
+import ServiceTermModal from '@/components/ServiceTermModal.vue'
 
 const filters = reactive({
   keyword: '',
@@ -38,7 +40,10 @@ const modalError = ref('')
 const editingId = ref(null)
 const modalInitial = ref({})
 const modalLoadingDetail = ref(false)
+const detailReady = ref(false)
 const wechatMerchant = ref(null)
+const resetMerchant = ref(null), termMerchant = ref(null)
+let detailGeneration = 0
 
 const totalPages = computed(() => {
   const t = Number(total.value) || 0
@@ -80,6 +85,8 @@ function onReset() {
 }
 
 function openCreate() {
+  detailGeneration++; modalLoadingDetail.value = false
+  detailReady.value = true
   modalMode.value = 'create'
   editingId.value = null
   modalInitial.value = {}
@@ -88,6 +95,8 @@ function openCreate() {
 }
 
 async function openEdit(id) {
+  const version = ++detailGeneration
+  detailReady.value = false
   modalMode.value = 'edit'
   editingId.value = id
   modalInitial.value = {}
@@ -97,21 +106,24 @@ async function openEdit(id) {
   modalLoadingDetail.value = true
   try {
     const detail = await getMerchantDetail(id)
+    if (version !== detailGeneration || editingId.value !== id || !modalOpen.value) return
     modalInitial.value = detail || {}
+    detailReady.value = Boolean(detail)
   } catch (e) {
-    modalError.value = e?.message || '加载详情失败'
+    if (version === detailGeneration) modalError.value = e?.message || '加载详情失败'
   } finally {
-    modalLoadingDetail.value = false
+    if (version === detailGeneration) modalLoadingDetail.value = false
   }
 }
 
 function closeModal() {
   if (modalSubmitting.value) return
   modalOpen.value = false
+  detailGeneration++; modalLoadingDetail.value = false
 }
 
 async function submitModal(payload) {
-  if (modalSubmitting.value || modalLoadingDetail.value) return
+  if (modalSubmitting.value || modalLoadingDetail.value || !detailReady.value) return
   modalSubmitting.value = true
   modalError.value = ''
   try {
@@ -197,7 +209,7 @@ onMounted(() => {
           {{ loadError }}
         </div>
 
-        <MerchantTable :loading="loading" :rows="rows" :pending-ids="pendingIds" @edit="openEdit" @toggle="toggleActive" @wechat="wechatMerchant = $event" />
+        <MerchantTable :loading="loading" :rows="rows" :pending-ids="pendingIds" @edit="openEdit" @toggle="toggleActive" @wechat="wechatMerchant = $event" @reset="resetMerchant = $event" @service="termMerchant = $event" />
 
         <PaginationBar
           :page="page"
@@ -215,11 +227,14 @@ onMounted(() => {
       :mode="modalMode"
       :initial-value="modalInitial"
       :submitting="modalSubmitting"
+      :disabled="!detailReady"
       :error-message="modalLoadingDetail ? '加载中...' : modalError"
       @close="closeModal"
       @submit="submitModal"
     />
     <MerchantWechatModal :open="!!wechatMerchant" :store-id="wechatMerchant?.id || ''" :store-name="wechatMerchant?.name || ''" @close="wechatMerchant = null" />
+    <ResetAdminModal :merchant="resetMerchant" @close="resetMerchant = null" />
+    <ServiceTermModal :merchant="termMerchant" @close="termMerchant = null" @saved="fetchList()" />
   </div>
 </template>
 

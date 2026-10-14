@@ -7,6 +7,8 @@ const props = defineProps({
   name: { type: String, default: '' },
   error: { type: String, default: '' },
   disabled: { type: Boolean, default: false },
+  autocomplete: { type: String, default: undefined },
+  maxlength: { type: [String, Number], default: undefined },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -23,6 +25,8 @@ const emit = defineEmits(['update:modelValue'])
       :value="modelValue"
       :placeholder="placeholder"
       :disabled="disabled"
+      :autocomplete="autocomplete"
+      :maxlength="maxlength"
       class="w-full rounded-md border px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-blue-600/30 disabled:bg-zinc-50"
       :class="
         error
