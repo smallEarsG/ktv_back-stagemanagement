@@ -6,7 +6,7 @@ import UiButton from './UiButton.vue'
 import UiInput from './UiInput.vue'
 import MerchantWechatModal from './MerchantWechatModal.vue'
 
-const props = defineProps({ merchant: { type: Object, default: null } })
+const props = defineProps({ merchant: { type: Object, default: null }, initialProduct: { type: String, default: '' } })
 const emit = defineEmits(['close', 'saved'])
 const products = ref([]), loading = ref(false), saving = ref(false), error = ref(''), message = ref(''), selected = ref(''), wechat = ref(null), uncertain = ref(false)
 const form = reactive({ granted: false, enabled: false, unlimited: true, expiresOn: '', reason: '', confirmExpired: false })
@@ -32,7 +32,7 @@ async function load() {
     if (version !== generation) return
     products.value = Array.isArray(data?.products) ? data.products : []
     if (!products.value.length) throw new Error('服务端未返回产品授权，请重新加载')
-    select(products.value[0])
+    select(products.value.find(p => p.productType === props.initialProduct) || products.value[0])
   } catch (e) { if (version === generation) error.value = e.message || '产品授权读取失败，请重试' }
   finally { if (version === generation) loading.value = false }
 }
@@ -62,7 +62,7 @@ async function toggleApplication() {
   finally { if (version === generation) saving.value = false }
 }
 function close() { if (!saving.value && !wechat.value) { generation++; emit('close') } }
-watch(() => props.merchant?.id, load, { immediate: true })
+watch(() => [props.merchant?.id, props.initialProduct], load, { immediate: true })
 onBeforeUnmount(() => { generation++ })
 </script>
 
