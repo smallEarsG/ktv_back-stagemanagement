@@ -10,8 +10,8 @@ const filters = reactive({ storeId: '', severity: '', kind: '', hours: 24, unres
 const autoRefresh = ref(true), processing = ref('')
 let revision = 0, stopped = false, timer
 const states = { OK: '正常', FAILED: '失败', STALE: '记录已过期', MISSING: '尚无记录', INVALID: '记录不可读', NOT_CONFIGURED: '尚未配置' }
-const sources = { SERVER: '服务端', MERCHANT: '商户后台', PLATFORM: '超级管理平台', MINI: '小程序', BACKGROUND: '后台任务', CHANNEL: '支付／团购渠道' }
-const kinds = { HTTP_SERVER: '接口异常', BUSINESS_FAILURE: '接口返回失败', SLOW_API: '接口响应慢', CLIENT_NETWORK: '网络请求失败', CLIENT_RUNTIME: '页面运行异常', CLIENT_UNHANDLED: '未处理的页面异常', BACKGROUND_ERROR: '后台任务异常', CHANNEL_UNCERTAIN: '渠道结果待确认', PAYMENT_QUERY_FAILED: '收款查询失败', REFUND_QUERY_FAILED: '退款查询失败', RECHARGE_QUERY_FAILED: '充值查询失败' }
+const sources = { MALL: '商城', SERVER: '服务端', MERCHANT: '商户后台', PLATFORM: '超级管理平台', MINI: '小程序', BACKGROUND: '后台任务', CHANNEL: '支付／团购渠道' }
+const kinds = { BIRTHDAY_JOB: '商城生日活动异常', ALERT_JOB: '告警任务异常', HTTP_SERVER: '接口异常', BUSINESS_FAILURE: '接口返回失败', SLOW_API: '接口响应慢', CLIENT_NETWORK: '网络请求失败', CLIENT_RUNTIME: '页面运行异常', CLIENT_UNHANDLED: '未处理的页面异常', BACKGROUND_ERROR: '后台任务异常', CHANNEL_UNCERTAIN: '渠道结果待确认', PAYMENT_QUERY_FAILED: '收款查询失败', REFUND_QUERY_FAILED: '退款查询失败', RECHARGE_QUERY_FAILED: '充值查询失败' }
 const notices = computed(() => {
   const s = summary.value
   if (!s) return []
@@ -65,8 +65,8 @@ onBeforeUnmount(() => { stopped = true; revision++; clearInterval(timer) })
       </div>
       <div class="mb-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <section class="rounded-lg bg-white p-4 shadow-sm"><h2 class="font-semibold">服务器巡检</h2><p class="my-2">{{ states[summary?.heartbeat?.state] || '加载中' }}</p><p class="text-sm text-slate-500">{{ time(summary?.heartbeat?.checkedAt) }}</p><p class="mt-2 text-sm">磁盘可用 {{ size(summary?.heartbeat?.diskFreeBytes) }}</p></section>
-        <section class="rounded-lg bg-white p-4 shadow-sm"><h2 class="font-semibold">每日自动备份</h2><p class="my-2">{{ states[summary?.backup?.state] || '加载中' }}</p><p class="text-sm text-slate-500">{{ time(summary?.backup?.checkedAt) }}</p><p class="mt-2 text-sm">{{ summary?.backup?.encrypted ? '已加密' : '待验证加密' }} · 保留 {{ summary?.backup?.backupCount ?? '—' }} 份</p><p v-if="!summary?.backup?.offsiteVerified" class="mt-1 text-xs text-amber-700">异地备份尚未验收</p></section>
-        <section class="rounded-lg bg-white p-4 shadow-sm"><h2 class="font-semibold">恢复演练</h2><p class="my-2">{{ states[summary?.restore?.state] || '加载中' }}</p><p class="text-sm text-slate-500">{{ time(summary?.restore?.checkedAt) }}</p><p class="mt-2 text-sm">{{ summary?.restore?.restoredTables ?? '—' }} 张表 · {{ summary?.restore?.rowsVerified ?? '—' }} 行已核对</p><p class="mt-1 text-xs text-slate-500">在隔离临时库恢复，不覆盖营业库</p></section>
+        <section class="rounded-lg bg-white p-4 shadow-sm"><h2 class="font-semibold">每日自动备份</h2><p class="my-2">{{ states[summary?.backup?.state] || '加载中' }}</p><p class="text-sm text-slate-500">{{ time(summary?.backup?.checkedAt) }}</p><p class="mt-2 text-sm">{{ summary?.backup?.encrypted ? '已加密' : '待验证加密' }} · 保留 {{ summary?.backup?.backupCount ?? '—' }} 份</p><p class="mt-1 text-xs text-slate-500">图片归档：{{ summary?.backup?.mediaIncluded ? `已包含 ${summary.backup.mediaFiles || 0} 张` : '待验收' }}</p><p v-if="!summary?.backup?.offsiteVerified" class="mt-1 text-xs text-amber-700">异地备份尚未验收</p></section>
+        <section class="rounded-lg bg-white p-4 shadow-sm"><h2 class="font-semibold">恢复演练</h2><p class="my-2">{{ states[summary?.restore?.state] || '加载中' }}</p><p class="text-sm text-slate-500">{{ time(summary?.restore?.checkedAt) }}</p><p class="mt-2 text-sm">{{ summary?.restore?.restoredTables ?? '—' }} 张表 · {{ summary?.restore?.rowsVerified ?? '—' }} 行已核对</p><p class="mt-1 text-xs text-slate-500">在隔离临时库恢复，不覆盖营业库</p><p class="mt-1 text-xs text-slate-500">图片校验：{{ summary?.restore?.mediaVerified ? `已通过 ${summary.restore.mediaFiles || 0} 张` : '待验收' }}</p></section>
         <section class="rounded-lg bg-white p-4 shadow-sm"><h2 class="font-semibold">多店压力验收</h2><p class="my-2">{{ states[summary?.loadTest?.state] || '加载中' }}</p><p class="text-sm text-slate-500">{{ time(summary?.loadTest?.checkedAt) }}</p><p class="mt-2 text-sm">{{ summary?.loadTest?.concurrency ?? '—' }} 并发 · {{ summary?.loadTest?.requests ?? '—' }} 次请求</p><p class="mt-1 text-xs text-slate-500">测试库只读结果，不能代表生产营业峰值</p></section>
       </div>
       <section class="rounded-lg bg-white p-4 shadow-sm sm:p-5">
@@ -84,7 +84,7 @@ onBeforeUnmount(() => { stopped = true; revision++; clearInterval(timer) })
         <p v-if="!rows.length" class="p-8 text-center text-slate-500">{{ loading ? '加载中…' : error ? '暂时无法确认异常记录，请刷新重试' : '所选范围暂无异常记录' }}</p>
         <div class="mt-4 flex items-center justify-between gap-2 text-sm"><span>共 {{ total }} 组 · 第 {{ filters.page }} / {{ pages }} 页</span><div class="flex gap-2"><UiButton variant="secondary" :disabled="loading || filters.page <= 1" @click="turn(filters.page - 1)">上一页</UiButton><UiButton variant="secondary" :disabled="loading || filters.page >= pages" @click="turn(filters.page + 1)">下一页</UiButton></div></div>
       </section>
-      <p class="mt-4 text-xs text-slate-500">当前告警在本平台展示。服务器完全不可用时需外部监控通知，短信、邮件及异地存储尚未配置。</p>
+      <p class="mt-4 text-xs text-slate-500">当前异常在本平台展示；站外告警、异地备份和发布预演请到“接入与发布”配置。真实外部发送和异地上传尚未启用。</p>
     </main>
     <UiModal :open="!!detail" title="异常详情" @close="detail = null">
       <div v-if="detail" class="space-y-3 break-all text-sm"><p>{{ sources[detail.source] }} · {{ kinds[detail.kind] }}</p><p>{{ detail.method }} {{ detail.route }}</p><p>首次：{{ time(detail.firstSeen) }}<br />最近：{{ time(detail.lastSeen) }}<br />累计：{{ detail.occurrences }} 次</p><p>最近追踪号：{{ detail.requestId || '此类错误无服务端追踪号' }}</p><p v-if="detail.errorType">异常类型：{{ detail.errorType }}</p><pre v-if="detail.frames" class="max-h-60 overflow-auto whitespace-pre-wrap rounded bg-slate-50 p-3">{{ detail.frames }}</pre><p class="text-slate-500">采集记录不包含密码、密钥、请求正文或原始异常消息。网络失败可能发生在请求送达服务器之前。</p><UiButton v-if="!detail.acknowledgedAt" :disabled="!!processing" @click="acknowledge(detail)">标记已处理</UiButton></div>

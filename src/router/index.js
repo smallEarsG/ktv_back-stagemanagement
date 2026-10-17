@@ -7,6 +7,7 @@ import MerchantsPage from '@/pages/MerchantsPage.vue'
 import OperationsPage from '@/pages/OperationsPage.vue'
 
 const routes = [
+  { path: '/integrations', name: 'integrations', component: () => import('@/pages/IntegrationsPage.vue'), meta: { requiresAuth: true } },
   { path: '/audit', name: 'audit', component: () => import('@/pages/AuditPage.vue'), meta: { requiresAuth: true } },
   { path: '/subscriptions', name: 'subscriptions', component: () => import('@/pages/SubscriptionsPage.vue'), meta: { requiresAuth: true } },
   { path: '/account/security', name: 'account-security', component: () => import('@/pages/AccountSecurityPage.vue'), meta: { requiresAuth: true } },
