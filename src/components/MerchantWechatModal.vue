@@ -1,12 +1,12 @@
 <script setup>
 import { onBeforeUnmount, reactive, ref, watch } from 'vue'
-import { getMerchantWechat, saveMerchantWechat } from '@/api/merchant'
+import { getMerchantWechat, saveMerchantWechat, getApplicationWechat, saveApplicationWechat } from '@/api/merchant'
 import { editableWechatConfig, emptyWechatForm, secretFields, wechatPayload } from '@/utils/wechat-config'
 import UiModal from '@/components/UiModal.vue'
 import UiInput from '@/components/UiInput.vue'
 import UiButton from '@/components/UiButton.vue'
 
-const props = defineProps({ open: Boolean, storeId: { type: [String, Number], default: '' }, storeName: { type: String, default: '' } })
+const props = defineProps({ open: Boolean, storeId: { type: [String, Number], default: '' }, storeName: { type: String, default: '' }, applicationId: { type: [String, Number], default: '' }, productName: { type: String, default: '' } })
 const emit = defineEmits(['close', 'saved'])
 const form = reactive(emptyWechatForm())
 const metadata = ref(null), loading = ref(false), saving = ref(false), error = ref(''), message = ref('')
@@ -17,7 +17,7 @@ async function load() {
   const version = ++generation, store = props.storeId
   wipe(); loading.value = true; saving.value = false
   try {
-    const value = await getMerchantWechat(store)
+    const value = props.applicationId ? await getApplicationWechat(store, props.applicationId) : await getMerchantWechat(store)
     if (disposed || version !== generation || !props.open) return
     metadata.value = value; Object.assign(form, editableWechatConfig(value))
   } catch (e) { if (!disposed && version === generation) error.value = e?.message || '读取门店微信配置失败，请重新加载' }
@@ -28,7 +28,7 @@ async function save() {
   const version = generation, store = props.storeId, body = wechatPayload(form, metadata.value.version)
   saving.value = true; error.value = ''; message.value = ''
   try {
-    const value = await saveMerchantWechat(store, body)
+    const value = props.applicationId ? await saveApplicationWechat(store, props.applicationId, body) : await saveMerchantWechat(store, body)
     if (disposed || version !== generation || !props.open) return
     metadata.value = value; Object.assign(form, editableWechatConfig(value))
     message.value = '此门店配置已保存，秘钥输入已清空。请完成微信授权和真实支付验收。'
@@ -40,7 +40,7 @@ async function save() {
   }
 }
 function close() { if (!saving.value) { generation++; wipe(); emit('close') } }
-watch(() => [props.open, props.storeId], () => {
+watch(() => [props.open, props.storeId, props.applicationId], () => {
   if (props.open && props.storeId) load()
   else { generation++; wipe(); loading.value = false; saving.value = false }
 }, { immediate: true })
@@ -48,9 +48,9 @@ onBeforeUnmount(() => { disposed = true; generation++; wipe() })
 </script>
 
 <template>
-  <UiModal :open="open" :title="`${storeName || '门店'} · 微信配置`" @close="close">
+  <UiModal :open="open" :title="`${storeName || '门店'} · ${productName || '点餐'}微信配置`" @close="close">
     <div class="max-h-[72vh] space-y-4 overflow-y-auto pr-1">
-      <p class="text-sm text-slate-600">门店 #{{ storeId }} 独立使用以下小程序和收款账号。秘钥只接受新值，留空保留已保存的值。</p>
+      <p class="text-sm text-slate-600">门店 #{{ storeId }} · {{ productName || '点餐' }}{{ applicationId ? `应用 #${applicationId}` : '' }} 独立使用以下小程序和收款账号。秘钥只接受新值，留空保留已保存的值。</p>
       <p v-if="loading" role="status">正在读取此门店配置…</p>
       <p v-if="error" role="alert" class="rounded bg-red-50 p-3 text-sm text-red-700">{{ error }}</p>
       <p v-if="message" role="status" class="rounded bg-green-50 p-3 text-sm text-green-700">{{ message }}</p>

@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import MerchantWechatModal from './MerchantWechatModal.vue'
-import { getMerchantWechat, saveMerchantWechat } from '@/api/merchant'
+import { getMerchantWechat, saveMerchantWechat, getApplicationWechat, saveApplicationWechat } from '@/api/merchant'
 
-vi.mock('@/api/merchant', () => ({ getMerchantWechat: vi.fn(), saveMerchantWechat: vi.fn() }))
+vi.mock('@/api/merchant', () => ({ getMerchantWechat: vi.fn(), saveMerchantWechat: vi.fn(), getApplicationWechat: vi.fn(), saveApplicationWechat: vi.fn() }))
 const config = (storeId, version = 1) => ({ storeId, version, enabled: true, paymentEnabled: false, appId: `wx-store-${storeId}`, merchantId: '', dataKeyReady: true, loginReady: true, hasAppSecret: true })
 let wrapper
 function page(storeId = 1) {
@@ -68,4 +68,16 @@ it('closing and reopening does not retain the previous secret or configuration',
   expect(wrapper.find('input[name="appSecret"]').exists()).toBe(false)
   expect(wrapper.html()).not.toContain('transient-secret')
   expect(button('保存此门店配置').attributes('disabled')).toBeDefined()
+})
+
+it('application configuration uses a separate endpoint and cannot overwrite dining credentials', async () => {
+  getApplicationWechat.mockResolvedValue(config(2, 4))
+  saveApplicationWechat.mockResolvedValue(config(2, 5))
+  wrapper = mount(MerchantWechatModal, { props: { open: true, storeId: 2, applicationId: 20, productName: '商城' }, global: { stubs: { teleport: true } } })
+  await flushPromises()
+  expect(getApplicationWechat).toHaveBeenCalledWith(2, 20)
+  await button('保存此门店配置').trigger('click'); await flushPromises()
+  expect(saveApplicationWechat.mock.calls[0].slice(0, 2)).toEqual([2, 20])
+  expect(saveApplicationWechat.mock.calls[0][2].expectedVersion).toBe(4)
+  expect(saveMerchantWechat).not.toHaveBeenCalled()
 })

@@ -39,3 +39,23 @@ export async function saveMerchantWechat(storeId, body) {
   return unwrapResult(await http.put(`/platform/stores/${encodeURIComponent(storeId)}/wechat`, body))
 }
 
+const merchantPath = id => `/platform/merchants/${encodeURIComponent(id)}`
+export async function getMerchantProducts(id) {
+  return unwrapResult(await http.get(`${merchantPath(id)}/products`))
+}
+export async function saveMerchantProduct(id, product, body) {
+  return unwrapResult(await http.put(`${merchantPath(id)}/products/${encodeURIComponent(product)}`, body))
+}
+export async function getMerchantApplication(id, application) {
+  return unwrapResult(await http.get(`${merchantPath(id)}/applications/${encodeURIComponent(application)}`))
+}
+export async function saveMerchantApplication(id, application, body) {
+  return unwrapResult(await http.put(`${merchantPath(id)}/applications/${encodeURIComponent(application)}`, body))
+}
+export async function getApplicationWechat(id, application) {
+  return unwrapResult(await http.get(`${merchantPath(id)}/applications/${encodeURIComponent(application)}/wechat`))
+}
+export async function saveApplicationWechat(id, application, body) {
+  return unwrapResult(await http.put(`${merchantPath(id)}/applications/${encodeURIComponent(application)}/wechat`, body))
+}
+
