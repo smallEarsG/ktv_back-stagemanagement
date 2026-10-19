@@ -14,7 +14,7 @@ describe('platform account boundary', () => {
   beforeEach(() => {
     clearAuth()
     setActivePinia(createPinia())
-    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
   it('rejects merchant login before saving a platform session', async () => {
@@ -51,5 +51,41 @@ describe('platform account boundary', () => {
     await router.push('/merchants')
     expect(router.currentRoute.value.path).toBe('/login')
     expect(getToken()).toBe('')
+  })
+
+  it('does not log out a new session when an older route profile request fails', async () => {
+    await router.push('/login')
+    setToken('session-A')
+    const auth = useAuthStore()
+    auth.bootstrap()
+    let rejectOld, started = false
+    const old = new Promise((resolve, reject) => { rejectOld = reject })
+    getCurrentUser.mockImplementationOnce(() => { started = true; return old })
+    const navigation = router.push('/merchants')
+    await vi.waitFor(() => expect(started).toBe(true))
+    login.mockResolvedValueOnce({ token: 'session-B', userInfo: { id: 2, storeId: 0, role: 'admin' } })
+    await auth.login('synthetic-account-B', 'synthetic-password')
+    rejectOld(new Error('Old request failed'))
+    await navigation
+    expect(auth.token).toBe('session-B')
+    expect(auth.user.id).toBe(2)
+    expect(getToken()).toBe('session-B')
+  })
+
+  it('clears expired recovery state so the login route can render', async () => {
+    await router.push('/login')
+    setToken('expired-session')
+    const auth = useAuthStore()
+    auth.bootstrap()
+    getCurrentUser.mockImplementationOnce(async () => {
+      clearAuth()
+      const error = new Error('登录已失效')
+      error.code = 401
+      throw error
+    })
+    await router.push('/merchants')
+    expect(auth.token).toBe('')
+    expect(auth.user).toBe(null)
+    expect(router.currentRoute.value.path).toBe('/login')
   })
 })

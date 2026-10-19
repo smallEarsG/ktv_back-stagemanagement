@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { isPlatformUser, PLATFORM_ACCOUNT_MESSAGE } from '@/utils/auth'
+import { getToken, isPlatformUser, PLATFORM_ACCOUNT_MESSAGE } from '@/utils/auth'
 
 import LoginPage from '@/pages/LoginPage.vue'
 import MerchantsPage from '@/pages/MerchantsPage.vue'
@@ -36,6 +36,7 @@ router.beforeEach(async (to) => {
     try {
       await auth.fetchMe()
     } catch (error) {
+      if (error?.code === 'AUTH_SUPERSEDED' && getToken()) return false
       auth.logout()
       return {
         path: '/login',

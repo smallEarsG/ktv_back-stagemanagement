@@ -63,6 +63,7 @@ async function onSubmit() {
     const redirect = route.query.redirect
     router.replace(typeof redirect === 'string' && redirect ? redirect : '/merchants')
   } catch (e) {
+    if (e?.code === 'AUTH_SUPERSEDED') return
     apiError.value = e?.message || '登录失败'
     entryExpired.value = Boolean(e?.demoEntryExpired)
   } finally {

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getToken, clearAuth } from '@/utils/auth'
+import { getToken, clearAuth, isCurrentAuthRequest } from '@/utils/auth'
 import { createTelemetryReporter } from '@/utils/telemetry'
 
 export const API_BASE_URL =
@@ -42,7 +42,7 @@ export function createHttpClient() {
         error.message = responseData.message || responseData.msg
       }
 
-      if (status === 401 || code === 401) {
+      if ((status === 401 || code === 401) && isCurrentAuthRequest(error.config || error.response?.config)) {
         clearAuth()
         const basePath = import.meta.env.BASE_URL || '/'
         const routePath = window.location.pathname.slice(basePath.length - 1)

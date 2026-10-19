@@ -12,6 +12,18 @@ export function getToken() {
   return localStorage.getItem(TOKEN_KEY) || ''
 }
 
+export function isCurrentAuthRequest(config) {
+  const token = getToken()
+  const authorization = config?.headers?.get?.('Authorization') || config?.headers?.Authorization || config?.headers?.authorization
+  return Boolean(token) && authorization === `Bearer ${token}`
+}
+
+export function supersededAuthRequest() {
+  const error = new Error('登录状态已更新')
+  error.code = 'AUTH_SUPERSEDED'
+  return error
+}
+
 export function setToken(token) {
   localStorage.setItem(TOKEN_KEY, token || '')
 }

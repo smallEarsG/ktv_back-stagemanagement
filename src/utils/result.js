@@ -1,4 +1,4 @@
-import { clearAuth } from '@/utils/auth'
+import { clearAuth, isCurrentAuthRequest } from '@/utils/auth'
 
 export function unwrapResult(res) {
   const payload = res?.data
@@ -9,7 +9,7 @@ export function unwrapResult(res) {
   }
 
   if (payload.code !== 200) {
-    if (payload.code === 401) {
+    if (payload.code === 401 && isCurrentAuthRequest(res.config)) {
       clearAuth()
       const basePath = import.meta.env.BASE_URL || '/'
       const routePath = window.location.pathname.slice(basePath.length - 1)
