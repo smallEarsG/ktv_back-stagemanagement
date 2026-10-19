@@ -6,7 +6,7 @@ vi.mock('@/api/merchant', () => ({ createMerchant: vi.fn(), disableMerchant: vi.
 let wrapper
 function page() {
   listMerchants.mockResolvedValue({ list: [], total: 0 })
-  wrapper = mount(MerchantsPage, { global: { stubs: ['AppHeader', 'MerchantTable', 'MerchantFormModal', 'MerchantWechatModal', 'ResetAdminModal', 'ServiceTermModal'] } })
+  wrapper = mount(MerchantsPage, { global: { stubs: ['AppHeader', 'MerchantTable', 'MerchantFormModal', 'MerchantWechatModal', 'ResetAdminModal', 'ServiceTermModal', 'MerchantProductsModal'] } })
 }
 afterEach(() => { wrapper?.unmount(); vi.resetAllMocks() })
 it('does not save merchant B using a late response from merchant A', async () => {
@@ -29,4 +29,12 @@ it('refuses to save when merchant detail could not be read', async () => {
   expect(modal.props('disabled')).toBe(true)
   modal.vm.$emit('submit', { name: '不完整表单' }); await flushPromises()
   expect(updateMerchant).not.toHaveBeenCalled()
+})
+
+it('routes the legacy renewal entry through business-specific product management', async () => {
+  page(); await flushPromises()
+  const merchant = { id: 42, name: '商城门店' }
+  wrapper.findComponent({ name: 'MerchantTable' }).vm.$emit('service', merchant); await flushPromises()
+  expect(wrapper.findComponent({ name: 'MerchantProductsModal' }).props('merchant')).toEqual(merchant)
+  expect(wrapper.findComponent({ name: 'ServiceTermModal' }).exists()).toBe(false)
 })

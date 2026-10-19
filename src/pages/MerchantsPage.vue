@@ -16,7 +16,6 @@ import PaginationBar from '@/components/PaginationBar.vue'
 import UiButton from '@/components/UiButton.vue'
 import UiInput from '@/components/UiInput.vue'
 import ResetAdminModal from '@/components/ResetAdminModal.vue'
-import ServiceTermModal from '@/components/ServiceTermModal.vue'
 import MerchantProductsModal from '@/components/MerchantProductsModal.vue'
 
 const filters = reactive({
@@ -43,7 +42,7 @@ const modalInitial = ref({})
 const modalLoadingDetail = ref(false)
 const detailReady = ref(false)
 const wechatMerchant = ref(null)
-const resetMerchant = ref(null), termMerchant = ref(null)
+const resetMerchant = ref(null)
 const productsMerchant = ref(null)
 let detailGeneration = 0
 
@@ -211,7 +210,7 @@ onMounted(() => {
           {{ loadError }}
         </div>
 
-        <MerchantTable :loading="loading" :rows="rows" :pending-ids="pendingIds" @edit="openEdit" @toggle="toggleActive" @wechat="wechatMerchant = $event" @reset="resetMerchant = $event" @service="termMerchant = $event" @products="productsMerchant = $event" />
+        <MerchantTable :loading="loading" :rows="rows" :pending-ids="pendingIds" @edit="openEdit" @toggle="toggleActive" @wechat="wechatMerchant = $event" @reset="resetMerchant = $event" @service="productsMerchant = $event" @products="productsMerchant = $event" />
 
         <PaginationBar
           :page="page"
@@ -236,7 +235,6 @@ onMounted(() => {
     />
     <MerchantWechatModal :open="!!wechatMerchant" :store-id="wechatMerchant?.id || ''" :store-name="wechatMerchant?.name || ''" @close="wechatMerchant = null" />
     <ResetAdminModal :merchant="resetMerchant" @close="resetMerchant = null" />
-    <ServiceTermModal :merchant="termMerchant" @close="termMerchant = null" @saved="fetchList()" />
     <MerchantProductsModal :merchant="productsMerchant" @close="productsMerchant = null" @saved="fetchList()" />
   </div>
 </template>

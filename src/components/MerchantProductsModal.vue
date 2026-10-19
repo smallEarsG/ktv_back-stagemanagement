@@ -32,7 +32,7 @@ async function load() {
     if (version !== generation) return
     products.value = Array.isArray(data?.products) ? data.products : []
     if (!products.value.length) throw new Error('服务端未返回产品授权，请重新加载')
-    select(products.value.find(p => p.productType === props.initialProduct) || products.value[0])
+    select(products.value.find(p => p.productType === props.initialProduct) || products.value.find(p => p.granted) || products.value.find(p => p.historyAccessible) || products.value[0])
   } catch (e) { if (version === generation) error.value = e.message || '产品授权读取失败，请重试' }
   finally { if (version === generation) loading.value = false }
 }

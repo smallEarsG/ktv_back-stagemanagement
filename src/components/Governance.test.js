@@ -48,6 +48,13 @@ it('blocks saving a term when its initial load failed', async () => {
   expect(button('保存服务期限').attributes('disabled')).toBeDefined()
 })
 
+it('clearly limits the legacy term editor to dining', async () => {
+  render(ServiceTermModal); await flushPromises()
+  expect(wrapper.text()).toContain('点餐服务期限')
+  expect(wrapper.text()).toContain('商城')
+  expect(wrapper.text()).toContain('产品与应用')
+})
+
 it('requires reauthentication, reason and confirmation, then wipes passwords even on uncertain failure', async () => {
   render(ResetAdminModal); await flushPromises()
   await wrapper.find('form').trigger('submit'); expect(resetAdmin).not.toHaveBeenCalled()

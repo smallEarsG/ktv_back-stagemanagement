@@ -46,3 +46,15 @@ it('revoking a product also clears permission for new trades', async () => {
   expect(saveMerchantProduct.mock.calls[0][2].granted).toBe(false)
   expect(saveMerchantProduct.mock.calls[0][2].enabled).toBe(false)
 })
+
+it('defaults a mall-only merchant to its purchased service rather than unopened dining', async () => {
+  getMerchantProducts.mockResolvedValue({ products: [
+    { productType: 'DINING', name: '点餐服务', granted: false, enabled: false, status: 'NOT_OPEN', version: 1 },
+    product(2, 8)
+  ] })
+  page(2); await flushPromises()
+  expect(wrapper.find('button[aria-pressed="true"]').text()).toContain('商城2')
+  await wrapper.find('input[name="productReason"]').setValue('商城续费一年')
+  await wrapper.find('form').trigger('submit'); await flushPromises()
+  expect(saveMerchantProduct.mock.calls[0].slice(0, 2)).toEqual([2, 'MALL'])
+})
