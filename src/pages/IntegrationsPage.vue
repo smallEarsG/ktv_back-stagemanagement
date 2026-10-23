@@ -13,7 +13,7 @@ const names = { TRACKING: '物流轨迹', WAYBILL: '电子面单', LOCAL_DELIVER
 const rows = ref([]), tasks = ref([]), merchants = ref([]), apps = ref([]), selectedStore = ref(''), selectedApps = ref([]), error = ref(''), result = ref(null), loading = ref(false), busy = ref(false), editor = ref(null), pending = ref(null)
 const form = reactive({}), release = reactive({ versionName: '', artifactSha256: '' }), authorization = reactive({ applicationId: '', authorized: false, evidence: '' })
 const key = `platform-integrations:${auth.user?.id || 'admin'}`
-let disposed = false
+let disposed = false, appsGeneration = 0
 try { pending.value = JSON.parse(localStorage.getItem(key) || 'null') } catch { pending.value = { damaged: true }; error.value = '原模拟任务恢复记录损坏，请先核对任务记录' }
 const requestId = () => `platform-${Date.now()}-${Math.random().toString(36).slice(2)}`
 async function get(path) { return unwrapResult(await http.get(root + path)) }
@@ -22,9 +22,19 @@ function open(row) { if (busy.value || pending.value) return; Object.keys(form).
 async function save() { if (busy.value || pending.value) return; busy.value = true; error.value = ''; try { const credentials = Object.fromEntries(['accountId', 'secret', 'endpoint', 'bucket', 'region'].filter(key => form[key].trim()).map(key => [key, form[key].trim()])); await http.put(`${root}/integrations/${form.kind}`, { expectedVersion: form.version, mode: form.mode, provider: form.provider, credentials }).then(unwrapResult); editor.value = null; await load() } catch (e) { error.value = e.message + '。请刷新读取最新状态再修改'; editor.value = null } finally { busy.value = false; form.secret = '' } }
 async function submit(path, body = {}) { if (busy.value || pending.value) return; const value = { path, body: { ...body, requestKey: requestId() } }; try { localStorage.setItem(key, JSON.stringify(value)); pending.value = value } catch { error.value = '无法保存任务恢复记录，暂不能提交'; return } return retry() }
 async function retry() { if (busy.value || !pending.value || pending.value.damaged) return; const operation = pending.value; if (!/^\/(integrations\/(TRACKING|WAYBILL|LOCAL_DELIVERY|ALERT|OFFSITE_BACKUP|MINIAPP_RELEASE)\/simulate|applications\/\d+\/authorization)$/.test(operation.path) || !operation.body?.requestKey) { error.value = '原任务格式无效，请先核对任务记录'; return } busy.value = true; error.value = ''; try { result.value = unwrapResult(await http.post(root + operation.path, operation.body)); localStorage.removeItem(key); pending.value = null; await load() } catch (e) { error.value = e.message; if ([400, 409, 422].includes(e.code) || [400, 409, 422].includes(e.response?.status)) { localStorage.removeItem(key); pending.value = null } } finally { busy.value = false } }
-async function loadApps() { apps.value = []; selectedApps.value = []; if (!selectedStore.value) return; try { const result = await getMerchantProducts(selectedStore.value); apps.value = (result.products || result.list || []).map(p => p.application).filter(Boolean) } catch (e) { error.value = e.message } }
+async function loadApps() {
+  const generation = ++appsGeneration, store = selectedStore.value
+  apps.value = []; selectedApps.value = []; error.value = ''
+  Object.assign(authorization, { applicationId: '', authorized: false, evidence: '' })
+  if (!store) return
+  const current = () => !disposed && generation === appsGeneration && store === selectedStore.value
+  try {
+    const result = await getMerchantProducts(store)
+    if (current()) apps.value = (result.products || result.list || []).map(p => p.application).filter(Boolean)
+  } catch (e) { if (current()) error.value = e.message }
+}
 function publishMock() { if (!selectedApps.value.length || !release.versionName.trim() || !/^[a-f0-9]{64}$/.test(release.artifactSha256)) { error.value = '请选择已授权应用、填写版本名称和发布包校验值'; return } submit('/integrations/MINIAPP_RELEASE/simulate', { ...release, applicationIds: selectedApps.value.map(Number), reference: '批量发布模拟验收' }) }
-onMounted(load); onBeforeUnmount(() => { disposed = true })
+onMounted(load); onBeforeUnmount(() => { disposed = true; appsGeneration++ })
 </script>
 
 <template>
