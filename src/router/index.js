@@ -7,6 +7,7 @@ import MerchantsPage from '@/pages/MerchantsPage.vue'
 import OperationsPage from '@/pages/OperationsPage.vue'
 
 const routes = [
+  { path: '/connection', name: 'connection', component: () => import('@/pages/ConnectionPage.vue'), meta: { requiresAuth: true } },
   { path: '/integrations', name: 'integrations', component: () => import('@/pages/IntegrationsPage.vue'), meta: { requiresAuth: true } },
   { path: '/audit', name: 'audit', component: () => import('@/pages/AuditPage.vue'), meta: { requiresAuth: true } },
   { path: '/subscriptions', name: 'subscriptions', component: () => import('@/pages/SubscriptionsPage.vue'), meta: { requiresAuth: true } },
@@ -37,6 +38,11 @@ router.beforeEach(async (to) => {
       await auth.fetchMe()
     } catch (error) {
       if (error?.code === 'AUTH_SUPERSEDED' && getToken()) return false
+      const expired = [error?.code, error?.response?.status].some(code => Number(code) === 401)
+      if (getToken() && !expired && error?.message !== PLATFORM_ACCOUNT_MESSAGE) {
+        if (to.path === '/connection') return true
+        return { path: '/connection', query: { redirect: to.fullPath } }
+      }
       auth.logout()
       return {
         path: '/login',
@@ -51,6 +57,7 @@ router.beforeEach(async (to) => {
   }
 
   if (auth.isAuthed && auth.user?.passwordChangeRequired && to.path !== '/account/security') return { path: '/account/security' }
+  if (to.path === '/connection' && auth.user) return { path: '/merchants' }
   if (to.path === '/login' && auth.isAuthed) return { path: '/merchants' }
 
   if (to.meta?.requiresAuth && !auth.isAuthed) {

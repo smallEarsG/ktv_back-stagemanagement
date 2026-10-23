@@ -9,13 +9,16 @@ import UiInput from '@/components/UiInput.vue'
 import UiButton from '@/components/UiButton.vue'
 const auth = useAuthStore(), router = useRouter(), busy = ref(false), error = ref('')
 const form = reactive({ currentPassword: '', newPassword: '', confirmPassword: '' })
-onBeforeUnmount(() => { Object.assign(form, { currentPassword: '', newPassword: '', confirmPassword: '' }) })
+let disposed = false
+onBeforeUnmount(() => { disposed = true; Object.assign(form, { currentPassword: '', newPassword: '', confirmPassword: '' }) })
 async function submit() {
   if (busy.value) return
   error.value = validatePasswordForm(form); if (error.value) return
   busy.value = true
-  try { await changePassword({ ...form }); auth.logout(); router.replace({ path: '/login', query: { reason: 'password-changed' } }) }
-  catch (e) { error.value = e.message || '修改结果未确认，请用新密码登录核对' }
+  const token = auth.token, session = auth.sessionGeneration
+  const current = () => !disposed && token === auth.token && session === auth.sessionGeneration
+  try { await changePassword({ ...form }); if (current()) { auth.logout(); router.replace({ path: '/login', query: { reason: 'password-changed' } }) } }
+  catch (e) { if (current()) error.value = e.message || '修改结果未确认，请用新密码登录核对' }
   finally { busy.value = false; form.currentPassword = ''; form.newPassword = ''; form.confirmPassword = '' }
 }
 </script>
